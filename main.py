@@ -197,6 +197,9 @@ class FirstWindow:
         free_frame = tk.Frame(self.root)
         free_frame.pack(pady=10)
 
+        if config.user_agent == "Kendi user-agent bilgini buraya yaz.":
+            messagebox.showerror("Hata", "Lütfen kurulum talimatlarını tekrar okuyun ve \"mhrs_data.json\" dosyası kendi user-agent bilginiz ile üncelleyin")
+
         vcmd = (self.root.register(self.validate_tc), "%P")
         self.username_entry = tk.Entry(self.root, fg="gray", width=22, validate="key", validatecommand=vcmd)
         self.username_entry.insert(0, self.ph_username)
