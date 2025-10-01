@@ -14,7 +14,7 @@ MHRS-Randevu, Python programlama diliyle yazılmış, kullanıcıların MHRS'de 
 
 ## Kurulum (Windows Kullanıcıları İçin)
 
-a
+
 ---
 
 ## Kurulum (Geliştiriciler İçin)
