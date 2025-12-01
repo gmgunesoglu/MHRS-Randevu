@@ -198,7 +198,7 @@ class FirstWindow:
         free_frame.pack(pady=10)
 
         if config.user_agent == "Kendi user-agent bilgini buraya yaz.":
-            messagebox.showerror("Hata", "Lütfen kurulum talimatlarını tekrar okuyun ve \"mhrs_data.json\" dosyası kendi user-agent bilginiz ile üncelleyin")
+            messagebox.showerror("Hata", "Lütfen kurulum talimatlarını tekrar okuyun ve \"mhrs_data.json\" dosyası kendi user-agent bilginiz ile güncelleyin.")
 
         vcmd = (self.root.register(self.validate_tc), "%P")
         self.username_entry = tk.Entry(self.root, fg="gray", width=22, validate="key", validatecommand=vcmd)
@@ -872,3 +872,9 @@ if __name__ == "__main__":
     """ gerçek time_delay değeri, eğer hata olursa message_box ile yazdırmak için ilk pencerede hesaplanır. """
     time_offset = 0
     FirstWindow()
+    # time_offset = google_ntp_client.get_time_offset()
+    # mhrs_client.headers["Authorization"] = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3N2UwMmI5MC03OTkxLTRlMjctYjdlMi0yYmVhZDA2ZTdmMmUiLCJpYXQiOjE3NTk0NzI1MTQsImV4cCI6MTc1OTU0NDUxNCwidXNlciI6eyJ1dWlkIjoiNWFmZTk3MzUtOWIyNC00MmMzLTlhMzMtYzc2YzRkYjZlNDliIiwidG9rZW5UaXBpIjoiVkFUQU5EQVMiLCJpc2xlbUthbmFsaSI6IlZBVEFOREFTX1dFQiJ9fQ.tcU4nKdSMKYI9cLVyxPbkGR1enumSGdf582z77PJ_3i4w57lmR7sS210PCTg7DnTDNv8Jw9hDFeIRN3-LZV0FA"
+    # mhrs_client.jwt = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3N2UwMmI5MC03OTkxLTRlMjctYjdlMi0yYmVhZDA2ZTdmMmUiLCJpYXQiOjE3NTk0NzI1MTQsImV4cCI6MTc1OTU0NDUxNCwidXNlciI6eyJ1dWlkIjoiNWFmZTk3MzUtOWIyNC00MmMzLTlhMzMtYzc2YzRkYjZlNDliIiwidG9rZW5UaXBpIjoiVkFUQU5EQVMiLCJpc2xlbUthbmFsaSI6IlZBVEFOREFTX1dFQiJ9fQ.tcU4nKdSMKYI9cLVyxPbkGR1enumSGdf582z77PJ_3i4w57lmR7sS210PCTg7DnTDNv8Jw9hDFeIRN3-LZV0FA"
+    # mhrs_client.username = "44848783084"
+    # mhrs_client.password = "Efsun0404."
+    # SecondWindow()

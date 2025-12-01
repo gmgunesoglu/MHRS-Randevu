@@ -1,7 +1,6 @@
 import requests
 from model import *
 import json
-
 import logging
 import time
 import base64
@@ -92,7 +91,7 @@ class MHRSClient:
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
             data = response.json()["data"]
-            return [Hospital.from_dict(item) for item in data]
+            return Hospital.flatten(data)
         else:
             raise RuntimeError(response.status_code, response.json())
 
@@ -151,15 +150,52 @@ class MHRSClient:
         if response.status_code == 428:
             res = response.json()
             """ Sistemin geri bildirim gönderme isteğine onay vermemek bot davranışı olarak değerlendirilebilir. Bu yüzden bu istek bu kodlarla onaylanıyor. """
-            if "warnings" in res and len(res["warnings"]) == 1 and "kodu" in res["warnings"][0] and res["warnings"][0]["kodu"] == "RND4030":
-                try:
-                    logging.warning("Sistem geri bildirim gönderme isteği yolladı. Onay veriliyor.")
-                    time.sleep(2)
-                    self.ask_schedule_creation(clinic, hospital, inspection_room, doctor)
-                except Exception as e:
-                    logging.exception(e)
-                return []
+            if "warnings" in res and len(res["warnings"]) == 1 and "kodu" in res["warnings"][0]:
+                if res["warnings"][0]["kodu"] == "RND4030":
+                    try:
+                        logging.warning("Sistem geri bildirim gönderme isteği yolladı. Onay veriliyor.")
+                        time.sleep(0.1)
+                        self.ask_schedule_creation(clinic, hospital, inspection_room, doctor)
+                        time.sleep(0.1)
+                        return self.get_all_schedules(city, town, clinic, hospital, inspection_room, doctor)
+                    except Exception as e:
+                        logging.exception(e)
+                    return []
+                elif res["warnings"][0]["kodu"] == "RND4034":
+                    try:
+                        logging.warning("Sistem aile hekiminden randevu almaya yönlendiriyor.")
+                        time.sleep(0.1)
+                        self.skip_family_doctor_request()
+                        time.sleep(0.1)
+                        self.ask_schedule_creation(clinic, hospital, inspection_room, doctor)
+                        logging.info("Aile hekimi yönlendirilmesi atlatıldı.")
+                        time.sleep(0.1)
+                        return self.get_all_schedules(city, town, clinic, hospital, inspection_room, doctor)
+                    except Exception as e:
+                        logging.exception(e)
         raise RuntimeError(response.status_code, response.json())
+
+    @relog_aspect
+    def skip_family_doctor_request(self) -> None:
+        url = "https://prd.mhrs.gov.tr/api/yonetim/genel/mesaj/by-kodu/GNL2030"
+        response = requests.get(url, headers=self.headers)
+        if response.status_code == 200:
+            res = response.json()
+            if "infos" in res and len(res["infos"]) == 1 and "kodu" in res["infos"][0] and res["infos"][0]["kodu"] == "GNL2030":
+                """ Aile hekimi yönlendirmesinin 2. aşaması (devam et butonuna tıklandıktan sonrası) """
+                logging.info("Aile hekimi yönlendirilmesinin atlatılmasının 1. aşaması OK.")
+                time.sleep(0.1)
+                url = "https://prd.mhrs.gov.tr/api/yonetim/genel/lookup/selectinput/HATIRLATMA_SAAT_SECIMI"
+                response = requests.get(url, headers=self.headers)
+                if response.status_code == 200:
+                    logging.info("Aile hekimi yönlendirilmesinin atlatılmasının 2. aşaması OK.")
+                else:
+                    logging.warning("Sistem aile hekimine yönlendiriyor. Bu yönlendirmenin atlatılması 2. aşamada hata ile karşılaşıyor.")
+                    raise RuntimeError(response.status_code, response.json())
+        else:
+            logging.warning("Sistem aile hekimine yönlendiriyor. Bu yönlendirmenin atlatılması 1. aşamada hata ile karşılaşıyor.")
+            raise RuntimeError(response.status_code, response.json())
+
 
     @relog_aspect
     def ask_schedule_creation(self, clinic: Clinic, hospital: Hospital | None, inspection_room: InspectionRoom | None, doctor: Doctor | None) -> None:

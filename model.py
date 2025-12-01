@@ -40,12 +40,12 @@ class BigDropdownListItem(DropdownListItem):
 
     @staticmethod
     def flatten(data: List[dict]) -> List["BigDropdownListItem"]:
-        """JSON listesinden düz City listesi döndürür (children dahil)."""
+        """ JSON listesinden düz liste döndürür (children dahil). """
         all_items = []
         seen = set()
 
         def _walk(node: dict):
-            dropdown_item = BigDropdownListItem.from_dict({**node, "children": []})  # çocukları boşalt
+            dropdown_item = BigDropdownListItem.from_dict({**node, "children": []})
             if dropdown_item.value not in seen:
                 all_items.append(dropdown_item)
                 seen.add(dropdown_item.value)
